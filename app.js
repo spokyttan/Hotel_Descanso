@@ -7,7 +7,7 @@
   'use strict';
 
   // ─── Config ───────────────────────────────────────────────
-  const API_BASE = 'http://3.142.235.11:8000';
+  const API_BASE = 'https://3.142.235.11.sslip.io';
 
   // ─── DOM Helpers ──────────────────────────────────────────
   const $ = (sel) => document.querySelector(sel);
@@ -113,8 +113,12 @@
   async function apiRequest(endpoint, options = {}) {
     const url = `${API_BASE}${endpoint}`;
     const config = {
-      headers: { 'Content-Type': 'application/json' },
       ...options,
+      headers: {
+        'Content-Type': 'application/json',
+        'X-API-Key': 'DescansoPremiumSecured2026!#',
+        ...(options.headers || {}),
+      },
     };
 
     try {
