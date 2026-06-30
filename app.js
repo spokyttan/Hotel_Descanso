@@ -375,6 +375,103 @@
     }
   }
 
+  // ─── Booking Bar Interactions ───────────────────────────────
+  const guestsTrigger = $('#guests-trigger');
+  const guestsDropdown = $('#guests-dropdown');
+  const guestsApply = $('#guests-apply');
+  const guestsSummary = $('#guests-summary');
+  const counterBtns = $$('.counter-btn');
+
+  const filtersToggle = $('#filters-toggle');
+  const filtersPanel = $('#filters-panel');
+
+  let guestsState = {
+    rooms: 1,
+    adults: 1,
+    children: 0
+  };
+
+  // Toggle guests dropdown
+  if (guestsTrigger && guestsDropdown) {
+    guestsTrigger.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const isActive = guestsTrigger.classList.toggle('active');
+      if (isActive) {
+        guestsDropdown.classList.add('show');
+      } else {
+        guestsDropdown.classList.remove('show');
+      }
+    });
+
+    // Prevent closing when clicking inside
+    guestsDropdown.addEventListener('click', (e) => {
+      e.stopPropagation();
+    });
+
+    // Close on outside click
+    document.addEventListener('click', () => {
+      guestsTrigger.classList.remove('active');
+      guestsDropdown.classList.remove('show');
+    });
+
+    // Apply button
+    if (guestsApply) {
+      guestsApply.addEventListener('click', () => {
+        guestsTrigger.classList.remove('active');
+        guestsDropdown.classList.remove('show');
+      });
+    }
+
+    // Counters logic
+    counterBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const target = btn.dataset.target;
+        const action = btn.dataset.action;
+        const valueEl = $(`#count-${target}`);
+        
+        if (action === 'increment') {
+          if (target === 'rooms' && guestsState.rooms >= 5) return;
+          if (target === 'adults' && guestsState.adults >= 10) return;
+          if (target === 'children' && guestsState.children >= 10) return;
+          guestsState[target]++;
+        } else {
+          if (target === 'rooms' && guestsState.rooms <= 1) return;
+          if (target === 'adults' && guestsState.adults <= 1) return;
+          if (target === 'children' && guestsState.children <= 0) return;
+          guestsState[target]--;
+        }
+
+        valueEl.textContent = guestsState[target];
+        updateGuestsSummary();
+      });
+    });
+  }
+
+  function updateGuestsSummary() {
+    if (!guestsSummary) return;
+    const r = guestsState.rooms;
+    const a = guestsState.adults;
+    const c = guestsState.children;
+    
+    let text = `${r} Habitación${r > 1 ? 'es' : ''}, ${a} Adulto${a > 1 ? 's' : ''}`;
+    if (c > 0) {
+      text += `, ${c} Niñ${c > 1 ? 'os' : 'o'}`;
+    }
+    guestsSummary.textContent = text;
+  }
+
+  // Toggle advanced filters
+  if (filtersToggle && filtersPanel) {
+    filtersToggle.addEventListener('click', () => {
+      const isActive = filtersToggle.classList.toggle('active');
+      if (isActive) {
+        filtersPanel.classList.add('show');
+      } else {
+        filtersPanel.classList.remove('show');
+      }
+    });
+  }
+
   // ─── Date Input Defaults ──────────────────────────────────
   function setDateDefaults() {
     const today = new Date().toISOString().split('T')[0];

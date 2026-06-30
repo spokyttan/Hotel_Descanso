@@ -433,6 +433,254 @@ img { max-width: 100%; display: block; }
   flex-shrink: 0;
 }
 
+/* Dropdown trigger */
+.booking-bar__field--dropdown {
+  position: relative;
+}
+
+.booking-bar__trigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  background: none;
+  border: none;
+  font-family: var(--font-sans);
+  font-size: 0.88rem;
+  color: var(--gray-800);
+  cursor: pointer;
+  padding: 2px 0;
+  text-align: left;
+}
+
+.booking-bar__chevron {
+  width: 16px;
+  height: 16px;
+  color: var(--gray-400);
+  transition: transform 0.2s var(--ease);
+}
+
+.booking-bar__trigger.active .booking-bar__chevron {
+  transform: rotate(180deg);
+}
+
+/* Dropdown panel */
+.guests-dropdown {
+  position: absolute;
+  top: calc(100% + 15px);
+  left: 0;
+  width: 320px;
+  background: var(--white);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-lg);
+  border: 1px solid var(--gray-200);
+  padding: 16px 20px;
+  z-index: 250;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(10px);
+  transition: all 0.2s var(--ease);
+}
+
+.guests-dropdown.show {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.guests-dropdown__row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--gray-100);
+}
+
+.guests-dropdown__row:last-of-type {
+  border-bottom: none;
+  margin-bottom: 8px;
+}
+
+.guests-dropdown__info {
+  display: flex;
+  flex-direction: column;
+}
+
+.guests-dropdown__name {
+  font-weight: 600;
+  color: var(--gray-800);
+  font-size: 0.9rem;
+}
+
+.guests-dropdown__hint {
+  font-size: 0.75rem;
+  color: var(--gray-500);
+}
+
+.guests-dropdown__counter {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.counter-btn {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 1px solid var(--gray-300);
+  background: var(--white);
+  color: var(--gray-600);
+  font-size: 1.1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.counter-btn:hover {
+  border-color: var(--brand-gold);
+  color: var(--brand-gold);
+}
+
+.counter-value {
+  font-weight: 600;
+  width: 20px;
+  text-align: center;
+  font-size: 0.95rem;
+}
+
+.guests-dropdown__apply {
+  width: 100%;
+  justify-content: center;
+  padding: 10px;
+  margin-top: 4px;
+}
+
+/* Select Tarifa */
+.booking-bar__select {
+  border: none;
+  background: transparent;
+  font-family: var(--font-sans);
+  font-size: 0.88rem;
+  color: var(--gray-800);
+  cursor: pointer;
+  padding: 2px 0;
+  width: 100%;
+  outline: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+}
+
+/* Filters toggle and panel */
+.booking-filters {
+  padding: 12px 24px 20px;
+  background: var(--gray-50);
+  border-top: 1px solid var(--gray-200);
+}
+
+.booking-filters__toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--brand-gold);
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.booking-filters__toggle svg {
+  width: 16px;
+  height: 16px;
+}
+
+.filters-chevron {
+  margin-left: 4px;
+  transition: transform 0.2s var(--ease);
+}
+
+.booking-filters__toggle.active .filters-chevron {
+  transform: rotate(180deg);
+}
+
+.booking-filters__panel {
+  display: none;
+  padding-top: 20px;
+  animation: fadeUp 0.3s var(--ease);
+}
+
+.booking-filters__panel.show {
+  display: block;
+}
+
+.booking-filters__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 20px;
+}
+
+.filter-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.filter-group label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--gray-600);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.filter-select,
+.filter-input {
+  padding: 10px 12px;
+  border: 1px solid var(--gray-300);
+  border-radius: var(--radius);
+  font-family: var(--font-sans);
+  font-size: 0.85rem;
+  color: var(--gray-800);
+  background: var(--white);
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.filter-select:focus,
+.filter-input:focus {
+  border-color: var(--brand-gold);
+}
+
+.filter-group--checks {
+  grid-column: 1 / -1;
+  border-top: 1px solid var(--gray-200);
+  padding-top: 16px;
+  margin-top: 8px;
+}
+
+.filter-checks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  margin-top: 4px;
+}
+
+.filter-check {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  color: var(--gray-700);
+}
+
+.filter-check input {
+  accent-color: var(--brand-gold);
+}
+
 /* ─── Buttons ────────────────────────────────────────────── */
 .btn {
   display: inline-flex;

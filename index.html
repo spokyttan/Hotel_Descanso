@@ -96,6 +96,7 @@
       <!-- Quick booking bar (Sheraton style) -->
       <div class="booking-bar">
         <div class="booking-bar__inner">
+          <!-- Fechas -->
           <div class="booking-bar__field">
             <span class="booking-bar__label">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
@@ -108,16 +109,139 @@
             </div>
           </div>
           <div class="booking-bar__divider"></div>
-          <div class="booking-bar__field">
-            <span class="booking-bar__label">HABITACIÓN</span>
-            <span class="booking-bar__value">1 Habitación, 1 Adulto</span>
+
+          <!-- Habitaciones y huéspedes (dropdown interactivo) -->
+          <div class="booking-bar__field booking-bar__field--dropdown">
+            <span class="booking-bar__label">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+              HABITACIONES Y HUÉSPEDES
+            </span>
+            <button class="booking-bar__trigger" id="guests-trigger" type="button">
+              <span id="guests-summary">1 Habitación, 1 Adulto</span>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" class="booking-bar__chevron"><polyline points="6 9 12 15 18 9"/></svg>
+            </button>
+            <!-- Dropdown panel -->
+            <div class="guests-dropdown" id="guests-dropdown">
+              <div class="guests-dropdown__row">
+                <div class="guests-dropdown__info">
+                  <span class="guests-dropdown__name">Habitaciones</span>
+                </div>
+                <div class="guests-dropdown__counter">
+                  <button type="button" class="counter-btn" data-target="rooms" data-action="decrement">−</button>
+                  <span class="counter-value" id="count-rooms">1</span>
+                  <button type="button" class="counter-btn" data-target="rooms" data-action="increment">+</button>
+                </div>
+              </div>
+              <div class="guests-dropdown__row">
+                <div class="guests-dropdown__info">
+                  <span class="guests-dropdown__name">Adultos</span>
+                  <span class="guests-dropdown__hint">18+ años</span>
+                </div>
+                <div class="guests-dropdown__counter">
+                  <button type="button" class="counter-btn" data-target="adults" data-action="decrement">−</button>
+                  <span class="counter-value" id="count-adults">1</span>
+                  <button type="button" class="counter-btn" data-target="adults" data-action="increment">+</button>
+                </div>
+              </div>
+              <div class="guests-dropdown__row">
+                <div class="guests-dropdown__info">
+                  <span class="guests-dropdown__name">Niños</span>
+                  <span class="guests-dropdown__hint">0–17 años</span>
+                </div>
+                <div class="guests-dropdown__counter">
+                  <button type="button" class="counter-btn" data-target="children" data-action="decrement">−</button>
+                  <span class="counter-value" id="count-children">0</span>
+                  <button type="button" class="counter-btn" data-target="children" data-action="increment">+</button>
+                </div>
+              </div>
+              <button type="button" class="btn btn--primary guests-dropdown__apply" id="guests-apply">Aplicar</button>
+            </div>
           </div>
           <div class="booking-bar__divider"></div>
+
+          <!-- Tarifa especial -->
           <div class="booking-bar__field">
-            <span class="booking-bar__label">TARIFA</span>
-            <span class="booking-bar__value">Mejor tarifa disponible</span>
+            <span class="booking-bar__label">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
+              TARIFA ESPECIAL
+            </span>
+            <select id="quick-rate" class="booking-bar__select">
+              <option value="best">Mejor tarifa disponible</option>
+              <option value="flexible">Tarifa flexible (cancelación gratuita)</option>
+              <option value="advance">Reserva anticipada (-15%)</option>
+              <option value="member">Tarifa miembro premium</option>
+            </select>
           </div>
+
           <button class="btn btn--booking" data-navigate="habitaciones">Ver disponibilidad</button>
+        </div>
+
+        <!-- Filtros avanzados expandibles -->
+        <div class="booking-filters">
+          <button class="booking-filters__toggle" id="filters-toggle" type="button">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="18" x2="20" y2="18"/><circle cx="8" cy="6" r="2" fill="currentColor"/><circle cx="16" cy="12" r="2" fill="currentColor"/><circle cx="10" cy="18" r="2" fill="currentColor"/></svg>
+            Más filtros de búsqueda
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" class="filters-chevron"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+          <div class="booking-filters__panel" id="filters-panel">
+            <div class="booking-filters__grid">
+              <div class="filter-group">
+                <label for="filter-room-type">Tipo de habitación</label>
+                <select id="filter-room-type" class="filter-select">
+                  <option value="">Todas las habitaciones</option>
+                  <option value="standard">Estándar</option>
+                  <option value="superior">Superior</option>
+                  <option value="deluxe">Deluxe</option>
+                  <option value="suite">Suite</option>
+                  <option value="presidential">Suite Presidencial</option>
+                </select>
+              </div>
+              <div class="filter-group">
+                <label for="filter-bed-type">Tipo de cama</label>
+                <select id="filter-bed-type" class="filter-select">
+                  <option value="">Sin preferencia</option>
+                  <option value="single">Cama individual</option>
+                  <option value="double">Cama doble</option>
+                  <option value="king">King size</option>
+                  <option value="twin">Dos camas individuales</option>
+                </select>
+              </div>
+              <div class="filter-group">
+                <label for="filter-view">Vista</label>
+                <select id="filter-view" class="filter-select">
+                  <option value="">Sin preferencia</option>
+                  <option value="city">Vista a la ciudad</option>
+                  <option value="garden">Vista al jardín</option>
+                  <option value="pool">Vista a la piscina</option>
+                </select>
+              </div>
+              <div class="filter-group">
+                <label for="filter-promo">Código promocional</label>
+                <input type="text" id="filter-promo" class="filter-input" placeholder="Ingrese su código" />
+              </div>
+              <div class="filter-group filter-group--checks">
+                <label>Servicios adicionales</label>
+                <div class="filter-checks">
+                  <label class="filter-check">
+                    <input type="checkbox" id="filter-accessible" />
+                    <span>♿ Accesibilidad</span>
+                  </label>
+                  <label class="filter-check">
+                    <input type="checkbox" id="filter-breakfast" />
+                    <span>🍳 Desayuno incluido</span>
+                  </label>
+                  <label class="filter-check">
+                    <input type="checkbox" id="filter-parking" />
+                    <span>🅿️ Estacionamiento</span>
+                  </label>
+                  <label class="filter-check">
+                    <input type="checkbox" id="filter-spa" />
+                    <span>💆 Acceso a Spa</span>
+                  </label>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
