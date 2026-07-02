@@ -108,14 +108,53 @@
             </div>
           </div>
           <div class="booking-bar__divider"></div>
-          <div class="booking-bar__field">
-            <span class="booking-bar__label">HABITACIÓN</span>
-            <span class="booking-bar__value">1 Habitación, 1 Adulto</span>
+          <div class="booking-bar__field booking-bar__field--guests">
+            <span class="booking-bar__label">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
+              </svg>
+              HUÉSPEDES
+            </span>
+            <button type="button" class="booking-bar__value booking-bar__guests-trigger" id="guests-trigger">
+              <span id="guests-summary">1 Habitación, 1 Adulto</span>
+              <svg class="booking-bar__chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg>
+            </button>
+            <!-- Guests Popover -->
+            <div class="guests-popover" id="guests-popover">
+              <div class="guests-popover__row">
+                <div class="guests-popover__label">
+                  <span class="guests-popover__name">Habitaciones</span>
+                  <span class="guests-popover__hint">Máx. 5</span>
+                </div>
+                <div class="guests-popover__counter">
+                  <button type="button" class="counter-btn counter-btn--minus" data-target="rooms" aria-label="Menos habitaciones">−</button>
+                  <span class="counter-value" id="counter-rooms">1</span>
+                  <button type="button" class="counter-btn counter-btn--plus" data-target="rooms" aria-label="Más habitaciones">+</button>
+                </div>
+              </div>
+              <div class="guests-popover__row">
+                <div class="guests-popover__label">
+                  <span class="guests-popover__name">Adultos</span>
+                  <span class="guests-popover__hint">Máx. 10</span>
+                </div>
+                <div class="guests-popover__counter">
+                  <button type="button" class="counter-btn counter-btn--minus" data-target="adults" aria-label="Menos adultos">−</button>
+                  <span class="counter-value" id="counter-adults">1</span>
+                  <button type="button" class="counter-btn counter-btn--plus" data-target="adults" aria-label="Más adultos">+</button>
+                </div>
+              </div>
+              <button type="button" class="btn btn--primary guests-popover__apply" id="guests-apply">Aplicar</button>
+            </div>
           </div>
           <div class="booking-bar__divider"></div>
           <div class="booking-bar__field">
-            <span class="booking-bar__label">TARIFA</span>
-            <span class="booking-bar__value">Mejor tarifa disponible</span>
+            <span class="booking-bar__label">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+                <line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+              </svg>
+              TARIFA ESTIMADA
+            </span>
+            <span class="booking-bar__value booking-bar__rate" id="estimated-rate">~$45.000 CLP / noche</span>
           </div>
           <button class="btn btn--booking" data-navigate="habitaciones">Ver disponibilidad</button>
         </div>
@@ -295,8 +334,16 @@
                   <input type="text" id="reserva-rut" placeholder="12.345.678-9" required />
                 </div>
                 <div class="form-group">
-                  <label for="reserva-habitacion">N° Habitación <span class="required">*</span></label>
-                  <input type="number" id="reserva-habitacion" placeholder="101" required />
+                  <label for="reserva-habitacion">Habitación Disponible <span class="required">*</span></label>
+                  <div class="select-wrapper">
+                    <select id="reserva-habitacion" required>
+                      <option value="" disabled selected>Cargando habitaciones…</option>
+                    </select>
+                    <button type="button" class="select-refresh" id="btn-refresh-rooms" aria-label="Recargar habitaciones">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+                    </button>
+                  </div>
+                  <span class="form-hint">Seleccione de las habitaciones disponibles</span>
                 </div>
               </div>
               <div class="form-row">

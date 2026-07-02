@@ -34,6 +34,26 @@
   const roomsLoader   = $('#rooms-loader');
   const statTotal     = $('#stat-total');
 
+  // Booking bar — guests popover
+  const guestsField     = $('.booking-bar__field--guests');
+  const guestsTrigger   = $('#guests-trigger');
+  const guestsPopover   = $('#guests-popover');
+  const guestsSummary   = $('#guests-summary');
+  const guestsApply     = $('#guests-apply');
+  const counterRooms    = $('#counter-rooms');
+  const counterAdults   = $('#counter-adults');
+  const estimatedRate   = $('#estimated-rate');
+
+  // Reserva rooms select
+  const reservaSelect   = $('#reserva-habitacion');
+  const btnRefreshRooms = $('#btn-refresh-rooms');
+
+  // State
+  let bookingRooms  = 1;
+  let bookingAdults = 1;
+  const BASE_PRICE  = 45000;  // CLP per night per room
+  let cachedRoomPrices = [];  // filled when rooms load from API
+
   // ─── Toast System ─────────────────────────────────────────
   const TOAST_ICONS = {
     success: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>`,
@@ -83,6 +103,11 @@
 
     // Scroll to top
     window.scrollTo({ top: 0, behavior: 'smooth' });
+
+    // Auto-load rooms when entering reservas section
+    if (sectionId === 'reservas') {
+      loadRoomsForReserva();
+    }
   }
 
   // Nav tab clicks
@@ -286,6 +311,136 @@
 
   btnRecargar.addEventListener('click', loadRooms);
 
+  // ─── 2b. Load Rooms into Reserva Select ───────────────────
+  async function loadRoomsForReserva() {
+    const refreshBtn = btnRefreshRooms;
+    refreshBtn.classList.add('is-loading');
+    reservaSelect.disabled = true;
+
+    try {
+      const rooms = await apiRequest('/habitaciones/disponibles');
+
+      reservaSelect.innerHTML = '';
+
+      if (!rooms || rooms.length === 0) {
+        reservaSelect.innerHTML = '<option value="" disabled selected>No hay habitaciones disponibles</option>';
+        cachedRoomPrices = [];
+      } else {
+        reservaSelect.innerHTML = '<option value="" disabled selected>Seleccione una habitación…</option>';
+
+        cachedRoomPrices = rooms.map(r => ({
+          numero: r.numero,
+          precio: r.precio_por_noche || r.precio || BASE_PRICE,
+          tipo: r.tipo || 'Estándar',
+        }));
+
+        rooms.forEach((room) => {
+          const opt = document.createElement('option');
+          opt.value = room.numero;
+          const precio = room.precio_por_noche || room.precio || '';
+          const tipo   = room.tipo ? ` — ${room.tipo}` : '';
+          const precioStr = precio ? ` · $${Number(precio).toLocaleString('es-CL')}` : '';
+          opt.textContent = `Hab. ${room.numero}${tipo}${precioStr}`;
+          reservaSelect.appendChild(opt);
+        });
+
+        // Update estimated rate with real prices if available
+        updateEstimatedRate();
+      }
+    } catch (err) {
+      reservaSelect.innerHTML = '<option value="" disabled selected>Error al cargar — reintente</option>';
+      cachedRoomPrices = [];
+    } finally {
+      refreshBtn.classList.remove('is-loading');
+      reservaSelect.disabled = false;
+    }
+  }
+
+  btnRefreshRooms.addEventListener('click', loadRoomsForReserva);
+
+  // ─── Booking Bar: Guests Popover ──────────────────────────
+  function togglePopover(show) {
+    const visible = typeof show === 'boolean' ? show : !guestsPopover.classList.contains('is-visible');
+    guestsPopover.classList.toggle('is-visible', visible);
+    guestsField.classList.toggle('open', visible);
+  }
+
+  guestsTrigger.addEventListener('click', (e) => {
+    e.stopPropagation();
+    togglePopover();
+  });
+
+  // Close popover on outside click
+  document.addEventListener('click', (e) => {
+    if (!guestsPopover.contains(e.target) && !guestsTrigger.contains(e.target)) {
+      togglePopover(false);
+    }
+  });
+
+  // Counter buttons
+  const LIMITS = { rooms: { min: 1, max: 5 }, adults: { min: 1, max: 10 } };
+
+  function updateCounterUI() {
+    counterRooms.textContent = bookingRooms;
+    counterAdults.textContent = bookingAdults;
+
+    // Enable/disable buttons based on limits
+    $$('.counter-btn').forEach((btn) => {
+      const target = btn.dataset.target;
+      const value = target === 'rooms' ? bookingRooms : bookingAdults;
+      const limits = LIMITS[target];
+      if (btn.classList.contains('counter-btn--minus')) {
+        btn.disabled = value <= limits.min;
+      } else {
+        btn.disabled = value >= limits.max;
+      }
+    });
+
+    // Update summary text
+    const roomLabel = bookingRooms === 1 ? 'Habitación' : 'Habitaciones';
+    const adultLabel = bookingAdults === 1 ? 'Adulto' : 'Adultos';
+    guestsSummary.textContent = `${bookingRooms} ${roomLabel}, ${bookingAdults} ${adultLabel}`;
+
+    // Update estimated rate
+    updateEstimatedRate();
+  }
+
+  function updateEstimatedRate() {
+    let pricePerNight;
+    if (cachedRoomPrices.length > 0) {
+      // Use average price from API
+      const avg = cachedRoomPrices.reduce((sum, r) => sum + r.precio, 0) / cachedRoomPrices.length;
+      pricePerNight = Math.round(avg) * bookingRooms;
+    } else {
+      pricePerNight = BASE_PRICE * bookingRooms;
+    }
+    estimatedRate.textContent = `~$${pricePerNight.toLocaleString('es-CL')} CLP / noche`;
+  }
+
+  $$('.counter-btn').forEach((btn) => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const target = btn.dataset.target;
+      const isPlus = btn.classList.contains('counter-btn--plus');
+
+      if (target === 'rooms') {
+        bookingRooms = Math.max(LIMITS.rooms.min, Math.min(LIMITS.rooms.max, bookingRooms + (isPlus ? 1 : -1)));
+      } else {
+        bookingAdults = Math.max(LIMITS.adults.min, Math.min(LIMITS.adults.max, bookingAdults + (isPlus ? 1 : -1)));
+      }
+
+      updateCounterUI();
+    });
+  });
+
+  guestsApply.addEventListener('click', () => {
+    togglePopover(false);
+    showToast('info', 'Configuración actualizada', guestsSummary.textContent);
+  });
+
+  // Initialize counter UI
+  updateCounterUI();
+
   // ─── 3. Crear Reserva (POST /reservas) ────────────────────
   formReserva.addEventListener('submit', async (e) => {
     e.preventDefault();
@@ -293,10 +448,11 @@
 
     try {
       const rut = validateNotEmpty($('#reserva-rut').value, 'RUT del Cliente');
-      const habitacion = parseInt($('#reserva-habitacion').value, 10);
+      const habitacion = parseInt(reservaSelect.value, 10);
       if (isNaN(habitacion) || habitacion <= 0) {
-        markFieldError('reserva-habitacion');
-        throw new Error('Ingrese un número de habitación válido.');
+        reservaSelect.classList.add('input-error');
+        reservaSelect.addEventListener('change', () => reservaSelect.classList.remove('input-error'), { once: true });
+        throw new Error('Seleccione una habitación disponible.');
       }
 
       const ingreso = $('#reserva-ingreso').value;
